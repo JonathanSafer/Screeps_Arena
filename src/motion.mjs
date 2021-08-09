@@ -90,27 +90,27 @@ const m = {
 
     generateMatrix: function(){
         const matrix = new CostMatrix
-        const structures = getObjectsByPrototype(Structures)
-        const creeps = getObjectsByPrototype(Creeps)
+        const structures = getObjectsByPrototype(Structure)
+        const creeps = getObjectsByPrototype(Creep)
+        const cSites = getObjectsByPrototype(ConstructionSite)
+        for(let i = 0; i < cSites.length; i++){
+            matrix.set(cSites[i].x,cSites[i].y, 255)
+        }
         for(let i = 0; i < structures.length; i++){
             if(OBSTACLE_OBJECT_TYPES[structures[i].structureType] 
                 || (structures[i].structureType == STRUCTURE_RAMPART && !structures[i].my)){
-                const pos = structures[i].pos
-                matrix.set(pos.x,pos.y, 255)
+                matrix.set(structures[i].x,structures[i].y, 255)
             } else if(structures[i].structureType == STRUCTURE_ROAD){
-                const pos = structures[i].pos
-                matrix.set(pos.x,pos.y, Math.ceil(moveSpeed/2))
+                matrix.set(structures[i].x,structures[i].y, Math.ceil(moveSpeed/2))
             }
         }
         for(let i = 0; i < creeps.length; i++){
             if(!creeps[i].my){
-                const pos = creeps[i].pos
-                matrix.set(pos.x,pos.y, 255)
+                matrix.set(creeps[i].x,creeps[i].y, 255)
             } else {
                 const ccache = m.getCreepCache(creeps[i])
                 if(!(ccache.lastMove >= getTime() - 1)){
-                    const pos = creeps[i].pos
-                    matrix.set(pos.x,pos.y, creepCost)
+                    matrix.set(creeps[i].x,creeps[i].y, creepCost)
                 }
             }
         }
@@ -121,7 +121,7 @@ const m = {
         const matrix = m.getMatrix(moveSpeed)
 
 
-        const result = searchPath(creep.pos, {pos: endPos, range: range}, {
+        const result = searchPath({x: creep.x, y: creep.y}, {pos: endPos, range: range}, {
             plainCost: Math.ceil(moveSpeed),
             swampCost: Math.ceil(moveSpeed * 5),
             maxOps: 10000,
